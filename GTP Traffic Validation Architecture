@@ -1,0 +1,32 @@
+flowchart LR
+    subgraph Client Network
+        UE[User Equipment]
+        eNB[eNodeB]
+    end
+    
+    subgraph Core Network
+        MME[MME]
+    end
+    
+    subgraph F5 BIG-IP
+        LB[Load Balancer]
+        iRule[GTPv2 iRule]
+    end
+    
+    subgraph Validation System
+        API[Validation API Server]
+        DB[(Future DB)]
+        LOG[Log Files]
+    end
+    
+    UE --> eNB
+    eNB --> MME
+    MME --> LB
+    LB --> iRule
+    iRule -- "Validate Request\n(MSISDN, IMSI, MEI,\nAPN, Cell ID)" --> API
+    API --> LOG
+    API -.- DB
+    
+    style iRule fill:#f96
+    style API fill:#95DAC1
+    style DB stroke-dasharray: 5 5
