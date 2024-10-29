@@ -33,6 +33,11 @@
 3. 點擊Create
 4. 複製並貼上`GTPv2_irule.txt`中的代碼
 5. 保存並應用到相應的Virtual Server (Virtual Server Profile記得選 GTP)
+6. 此irule 有另外呼叫二個irule 來發送api request,請參考以下連結。
+    https://clouddocs.f5.com/api/irules/HTTP-Super-SIDEBAND-Requestor-Client-Handles-Redirects-Cookies-Chunked-Transfer-APM-Access-etc.html
+
+第六步驟的延伸
+1. 
 
 ### 2. API服務器設置
 
