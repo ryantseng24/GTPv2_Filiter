@@ -32,7 +32,7 @@
 2. 導航至Local Traffic > iRules
 3. 點擊Create
 4. 複製並貼上`GTPv2_irule.txt`中的代碼
-5. 保存並應用到相應的Virtual Server
+5. 保存並應用到相應的Virtual Server (Virtual Server Profile記得選 GTP)
 
 ### 2. API服務器設置
 
