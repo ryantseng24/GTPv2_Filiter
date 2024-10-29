@@ -37,7 +37,9 @@
     https://clouddocs.f5.com/api/irules/HTTP-Super-SIDEBAND-Requestor-Client-Handles-Redirects-Cookies-Chunked-Transfer-APM-Access-etc.html
 
 第六步驟的延伸
-1. 
+1. HSSR.tcl放進F5 irule
+2. HSSR_reporter.tcl 放進F5 iruleˇ
+3. 使用注意事項，請參考HSSR_注意事項.png
 
 ### 2. API服務器設置
 
