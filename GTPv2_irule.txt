@@ -1,0 +1,86 @@
+when RULE_INIT {
+   set static::debug_flag 2
+   # Set API endpoint
+   set static::api_host "10.8.52.101"
+   set static::api_uri "/validate-gtp"
+   
+   # Define logging format separator
+   set static::log_separator "|"
+}
+
+when CLIENT_DATA {
+   set gtp_message [GTP::parse [UDP::payload]]
+   set GTP_version [GTP::header version -message $gtp_message]
+   set GTP_type [GTP::header type -message $gtp_message]
+   
+   if { $GTP_version == 2 } {
+       # IE numbers for GTPv2
+       set ie_msisdn 76
+       set ie_imsi 1
+       set ie_mei 75
+       set ie_uli 86
+       set ie_apn 71
+       set header_type 32
+       
+       if { $GTP_type == $header_type } {
+           # Get IE values
+           set msisdn [GTP::ie get value -message $gtp_message $ie_msisdn]
+           set imsi [GTP::ie get value -message $gtp_message $ie_imsi]
+           set mei [GTP::ie get value -message $gtp_message $ie_mei]
+           set uli [GTP::ie get value -message $gtp_message $ie_uli]
+           set apn [GTP::ie get value -message $gtp_message $ie_apn]
+           
+           # Parse ULI to get cell ID
+           set cell_id ""
+           if { $uli ne "" } {
+               set uli_parts [split $uli]
+               # Get second to last element (index -2)
+               set ecgi_part [lindex $uli_parts end-1]
+               log local0. "DEBUG: ECGI part: $ecgi_part"
+               
+               # Remove braces and split
+               set ecgi_elements [split [string trim $ecgi_part "{}"]]
+               log local0. "DEBUG: ECGI elements: $ecgi_elements"
+               
+               # Get last element as cell ID
+               set cell_id [lindex $ecgi_elements end]
+           }
+           
+           # Prepare API request
+           set payload "\{\"msisdn\":\"$msisdn\",\"imsi\":\"$imsi\",\"mei\":\"$mei\",\"apn\":\"$apn\",\"cell_id\":\"$cell_id\"\}"
+           
+           # Call API using HSSR
+           set api_status [call HSSR::http_req \
+               -uri "http://$static::api_host$static::api_uri" \
+               -method "POST" \
+               -type "application/json" \
+               -body $payload \
+               -state "api_state" \
+               -rbody "api_response"]
+
+           # Create log entry with all fields
+           set timestamp [clock format [clock seconds] -format "%Y-%m-%d %H:%M:%S"]
+           set log_entry $timestamp
+           append log_entry "$static::log_separator$msisdn"
+           append log_entry "$static::log_separator$imsi"
+           append log_entry "$static::log_separator$mei"
+           append log_entry "$static::log_separator$apn"
+           append log_entry "$static::log_separator$cell_id"
+           append log_entry "$static::log_separator$api_status"
+           append log_entry "$static::log_separator$api_response"
+           
+           # Log the entry
+           log local0. "GTP_VALIDATION: $log_entry"
+
+           # Allow or drop packet based on API response
+           if { $api_status equals "200" } {
+               log local0. "INFO: API validation successful, allowing packet"
+               return
+           } else {
+               log local0. "ERROR: API validation failed ($api_status), dropping packet"
+               UDP::drop
+               return
+           }
+       }
+   }
+}
