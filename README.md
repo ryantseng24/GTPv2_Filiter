@@ -130,8 +130,12 @@ curl -X POST http://localhost/validate-gtp \
 
 2. 查看日誌：
 ```bash
-tail -f gtp_validation.log
+tail -f gtp_validation.
 ```
+
+3. 使用gtp_traffic 測試封包打向F5
+
+可以使用tcprewrite 及tcpreplay 的工具修改封包後打向F5 , 測試irule 運作。
 
 ## 未來擴展
 - 資料庫整合
