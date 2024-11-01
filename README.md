@@ -32,6 +32,7 @@
 2. 導航至Local Traffic > iRules
 3. 點擊Create
 4. 複製並貼上`GTPv2_irule.txt`中的代碼
+   4.1. 新增Data Group : country_list （string 類型）, 並放入要驗證的國別代碼。例如502 (馬來西亞）
 5. 保存並應用到相應的Virtual Server (Virtual Server Profile記得選 GTP)
 6. 此irule 有另外呼叫二個irule 來發送api request,請參考以下連結。
     https://clouddocs.f5.com/api/irules/HTTP-Super-SIDEBAND-Requestor-Client-Handles-Redirects-Cookies-Chunked-Transfer-APM-Access-etc.html
